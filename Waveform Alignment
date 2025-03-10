@@ -1,0 +1,24 @@
+import librosa
+import numpy as np
+
+def align_audio(main_audio_path, phone_audio_path):
+    # Load audio
+    main_y, main_sr = librosa.load(main_audio_path, sr=None)
+    phone_y, phone_sr = librosa.load(phone_audio_path, sr=None)
+
+    # Resample phone audio if sample rates differ
+    if phone_sr != main_sr:
+        phone_y = librosa.resample(phone_y, phone_sr, main_sr)
+
+    # Compute cross-correlation
+    corr = np.correlate(main_y, phone_y, mode='full')
+    shift = np.argmax(corr) - len(phone_y)
+
+    # Positive shift means phone_y starts earlier, negative means it starts later
+    # Create aligned phone signal (assuming shift is within range)
+    if shift > 0:
+        aligned_phone = np.pad(phone_y, (shift, 0), mode='constant')
+    else:
+        aligned_phone = phone_y[-shift:]
+
+    return main_y, aligned_phone, main_sr
