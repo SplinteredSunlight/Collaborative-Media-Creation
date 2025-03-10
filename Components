@@ -1,0 +1,201 @@
+### Components
+
+1. **Mobile Clients (Phones)**
+   - Capture footage in real-time or upload after the event.
+   - Possibly have a small app (iOS/Android) to manage file uploads, event joining, and basic previews.
+
+2. **Local Hub (Mac mini)**
+   - Runs a local server to coordinate file ingestion and store media.
+   - Performs audio/video sync, AI-driven editing, and final rendering.
+   - Optionally provides a web interface or local network interface for review.
+
+3. **Soundboard Feed**
+   - Captured via an audio interface connected to the Mac mini.
+   - Used as the primary audio track; phone audio can be used as secondary/ambient.
+
+4. **Storage**
+   - Local storage on the Mac mini (or an external SSD) holds raw media.
+   - Optionally sync final products to a cloud service (AWS S3, Google Drive, YouTube, etc.).
+
+---
+
+## Tech Stack
+
+1. **Server / Backend**
+   - **Language**: Node.js (Express, Koa, or Fastify) or Python (Flask, FastAPI)  
+   - **Why Node.js?** Great for real-time applications, easy to set up REST/WebSocket endpoints.  
+   - **Why Python?** Excellent for AI-related tasks (PyTorch, TensorFlow, OpenCV).
+
+2. **Local Data Handling**
+   - **Databases**: 
+     - Could use a lightweight database (SQLite) or a local instance of PostgreSQL for metadata.
+     - Media files stored on disk (external SSD) in structured folders by event ID.
+   - **Server**: Host a simple REST or GraphQL API to accept file uploads.
+
+3. **AI/ML Tools (optional advanced features)**
+   - **Python Libraries**:
+     - **OpenCV**: For video processing, scene detection, basic feature extraction.
+     - **FFmpeg** (not Python-specific, but typically invoked by Python or Node.js): For merging, trimming, transcoding video/audio.
+     - **Librosa** or **PyAudioAnalysis**: For audio waveform analysis, applause detection, highlight detection.
+     - **PyTorch** or **TensorFlow**: If we add more advanced or custom deep learning models (e.g., for object detection, face recognition, etc.).
+
+4. **Frontend / User Interface**
+   - **Mobile App**:  
+     - Cross-platform solutions like React Native or Flutter.  
+     - Or separate native apps for iOS (Swift) and Android (Kotlin).
+   - **Web Interface**:
+     - Single-page application (React, Vue.js, or Svelte) served by the Mac mini.
+     - Used to preview and manage editing tasks.
+
+5. **Audio Pipeline**
+   - **Soundboard** -> Mac mini (via USB audio interface or line-in).
+   - **FFmpeg** for mixing the board feed with a lower-level ambient feed from phone mics.
+
+---
+
+## Detailed Features
+
+1. **Event Creation**
+   - Host (organizer) starts a new event on the Mac mini (or the mobile app).
+   - Generates a unique event ID or QR code for participants to join.
+
+2. **Multi-Device Upload**
+   - Participants use the app or a web form to upload photos/videos.
+   - Large file chunking or compression might be needed for reliability.
+
+3. **Audio Sync & Alignment**
+   - Phones record video with embedded audio.
+   - The Mac mini records a direct feed from the board in parallel.
+   - Synchronization approached by:
+     1. **Waveform alignment**: Cross-correlate phone audio waveforms to the board feed.
+     2. **Manual sync**: Prompt user to do a “clap” or a short beep at the start.
+     3. **Timecode** (Advanced): If the board and phones support SMPTE or LTC.
+
+4. **Editing & Highlight Detection**
+   - Automatic trimming of silent or “boring” segments (based on audio amplitude or motion).
+   - Identify applause peaks or high-motion frames to create a highlight reel.
+   - Optionally incorporate advanced AI to detect key moments (like solos, speaking, etc.).
+
+5. **Multi-Cam Angle Switching**
+   - If multiple phones capture the same moment, automatically select the best angle or cut between them periodically.
+   - Could use heuristics (e.g., user upvotes, faces in frame, stability) or a rule-based approach (cut every X seconds).
+
+6. **Audio Mixing & Mastering**
+   - Use the board feed as the primary track.
+   - Layer ambient phone audio at a lower volume.
+   - Fade in/out ambient during applause or crowd reaction.
+
+7. **Rendering & Export**
+   - FFmpeg-based pipeline merges the selected video streams and audio tracks.
+   - Output options (1080p or 4K, different aspect ratios, etc.).
+   - Final file ready to publish locally or upload to YouTube or other platforms.
+
+8. **User Review & Collaboration**
+   - Web dashboard (or phone interface) where participants can see:
+     - Thumbnails of uploaded footage
+     - Automatic rough preview
+     - Options to like or highlight certain clips
+   - Admin/host can finalize or trigger re-render with changes.
+
+---
+
+## Implementation Steps
+
+### Phase 1: Proof of Concept (MVP)
+
+1. **Local Server Setup**
+   - Spin up a Node.js or Python server on the Mac mini.
+   - Create a simple API endpoint for file uploads (`POST /upload`).
+
+2. **Basic Video Storage**
+   - Store uploaded videos/images in a folder structure:  
+     ```
+     /media/eventID/phoneID/filename.mp4
+     ```
+
+3. **Soundboard Feed Capture**
+   - Ensure you can record the board feed in real-time to a WAV or similar high-quality format.
+   - Save it as `/media/eventID/soundboard.wav`.
+
+4. **Manual Sync Script**
+   - Write a Python/Node.js script to:
+     - Take a phone video and the soundboard audio.
+     - Align them by searching for a clap spike or beep at the start (if provided).
+     - Merge them with FFmpeg (soundboard feed at 100% volume, phone track at lower level).
+   - Output a single merged file.
+
+5. **Result**
+   - You have a simple pipeline: phone uploads -> soundboard feed -> basic alignment -> single video + audio file.
+
+### Phase 2: Multi-Camera & Automatic Editing
+
+1. **Multiple Video Sync**
+   - Extend the script to handle multiple videos at once.
+   - Align each phone’s audio track to the board feed.
+   - Optionally create a single timeline with multiple “layers” of video.
+
+2. **Angle Selection**
+   - Start with a simple logic: cut between cameras every X seconds or based on random intervals.
+   - Output a multi-cam edited video.
+
+3. **Ambient Audio Blending**
+   - Collect phone audio tracks, detect crowd noise moments (e.g., using amplitude thresholds).
+   - Fade in phone audio during applause or cheers, keep it low otherwise.
+
+4. **Simple Highlight Detection**
+   - Use amplitude peaks in the board feed to mark potential “exciting” sections.
+   - Optionally do motion detection with OpenCV to find action in the video frames.
+
+### Phase 3: Advanced AI & User Collaboration
+
+1. **User Ratings & Tagging**
+   - In the web/mobile interface, allow participants to tag interesting moments or upvote others’ clips.
+   - Use these signals in the editing logic to prioritize certain angles or sections.
+
+2. **Smart Angle Switching**
+   - Analyze frames for stable shots, detect faces or instruments.  
+   - If a phone feed is high quality (steady, well-lit), favor it over shaky or underexposed feeds.
+
+3. **Multi-Version Preview**
+   - Generate multiple style previews (fast-paced, slow/emotional, comedic with quick cuts, etc.).
+   - Let the user pick or refine.
+
+4. **Photo Animations**
+   - If participants upload still photos, apply Ken Burns effect (pan & zoom).
+   - Incorporate them in the final reel as transitions or cutaways.
+
+5. **Scalability & Optimization**
+   - Enable parallel processing: If multiple events or large concurrency, ensure the Mac mini can handle it or queue tasks.
+   - Possibly offload some steps to a GPU or specialized cloud service if needed.
+
+---
+
+## Directory Structure (Example)
+
+```plaintext
+multi-cam-project/
+├── server/
+│   ├── index.js (or main.py)
+│   ├── routes/
+│   ├── controllers/
+│   ├── scripts/
+│   │   ├── syncAndMerge.js (or sync_and_merge.py)
+│   │   └── highlightDetection.py
+│   └── package.json (or requirements.txt)
+├── client/
+│   ├── mobile/
+│   │   ├── (React Native / Flutter code)
+│   ├── web/
+│   │   ├── public/
+│   │   ├── src/
+│   │   └── package.json (if React, Vue, etc.)
+└── media/
+    └── eventID/
+        ├── phone1/
+        │   ├── clip1.mp4
+        │   └── clip2.mp4
+        ├── phone2/
+        │   └── clip1.mp4
+        ├── soundboard.wav
+        └── output/
+            └── final_merged.mp4
