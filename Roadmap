@@ -1,0 +1,15 @@
+Next Steps / Roadmap
+	1.	Finalize the MVP:
+	•	Basic file upload, soundboard capture, manual or clap-based sync.
+	2.	Implement Automatic Waveform Sync:
+	•	Script to align phone recordings with the board feed.
+	3.	Multi-Cam Support:
+	•	Combine multiple videos, either in a single timeline or cut between them.
+	4.	AI-Driven Editing & Highlight Detection:
+	•	Detect applause peaks, instrument solos, or moving subjects for highlight reels.
+	5.	User Collaboration:
+	•	Add a web or mobile dashboard where participants can upvote clips, mark highlights, or request certain angles.
+	6.	Refine Audio Mixing:
+	•	Perform advanced blending or apply noise-reduction to phone audio for crowd ambiance.
+	7.	Publishing Tools:
+	•	Simple UI to export final videos to YouTube, social media, or cloud storage.
