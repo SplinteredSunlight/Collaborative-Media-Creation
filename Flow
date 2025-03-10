@@ -1,0 +1,20 @@
+ [Phones x N]                   [Soundboard]
+       |                                |
+ (Video/Audio)                     (Audio Out)
+       |                                |
+   (Wi-Fi)                          (Cable/USB)
+       |                                |
+     [Router]    --- local network ---> |
+       |                                |
+    [Mac Mini]  <-- Main server and AI pipeline
+       |
+---------------------------------
+|  Live or Post-Event Merging & Sync
+|  Audio Mix, Multi-cam Editing, AI
+---------------------------------
+       |
+ [Final Videos / Reels]
+       |
+[Local Storage / External SSD]
+       |
+ [Optional: Upload to YouTube / Cloud]
