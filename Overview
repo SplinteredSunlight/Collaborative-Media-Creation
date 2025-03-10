@@ -1,0 +1,35 @@
+# Multi-Device Collaborative Video Project
+
+## Overview
+
+This project aims to create an application (and underlying system) that allows multiple users to capture photo and video footage at an event (e.g., a music performance) and seamlessly merge those clips into a single, polished video. A **key feature** is the ability to incorporate a high-quality **soundboard feed** to improve audio quality—blending it with ambient sounds from the crowd recordings. By leveraging AI/ML and rule-based logic, the system will automate much of the editing process.
+
+---
+
+## Key Goals
+
+1. **Multi-Device Collaboration**  
+   - Allow 10–20 people (or more) to join an event/session and upload their media (photos & videos).
+   - Automatically synchronize footage by aligning timestamps or waveforms.
+
+2. **High-Quality Audio Integration**  
+   - Capture a clean audio track from the soundboard.
+   - Sync phone audio tracks with the soundboard feed and blend for ambiance.
+
+3. **AI-Driven Editing**  
+   - Automatically detect highlights, interesting angles, or moments of high energy.
+   - Generate a cohesive final video reel with transitions, possible animations (e.g., Ken Burns for photos), and minimal user intervention.
+
+4. **Local Hub for Processing**  
+   - Use a **Mac mini** (or similar on-premises computer) as the local server and processing hub.
+   - Reduce reliance on cloud computing for heavy video editing/AI tasks.
+
+5. **User-Facing Simplicity**  
+   - Provide an intuitive mobile or web interface for event participants.
+   - Make sharing, reviewing, and publishing the final video easy.
+
+---
+
+## Architecture
+
+### High-Level Diagram
