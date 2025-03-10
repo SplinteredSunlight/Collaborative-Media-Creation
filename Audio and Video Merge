@@ -1,0 +1,21 @@
+const { exec } = require('child_process');
+
+/**
+ * Merges phone video with soundboard audio using FFmpeg.
+ * @param {string} phoneVideoPath
+ * @param {string} soundboardPath
+ * @param {string} outputPath
+ */
+function mergeAudio(phoneVideoPath, soundboardPath, outputPath) {
+  // Example command: 
+  // ffmpeg -i phoneVideo.mp4 -i soundboard.wav -filter_complex "[1:a]volume=1.0[a1];[0:a]volume=0.3[a2];[a1][a2]amix=inputs=2:duration=longest" -c:v copy -c:a aac output.mp4
+  const command = `ffmpeg -i "${phoneVideoPath}" -i "${soundboardPath}" -filter_complex "[1:a]volume=1.0[a1];[0:a]volume=0.3[a2];[a1][a2]amix=inputs=2:duration=longest" -c:v copy -c:a aac "${outputPath}"`;
+
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error merging audio:', error);
+      return;
+    }
+    console.log('Merge complete:', stdout, stderr);
+  });
+}
